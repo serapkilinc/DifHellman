@@ -15,10 +15,10 @@ To run the chat application locally on your machine, follow these steps:
 1. Clone this repository to your local machine:
 
    ```bash
-   git clone https://github.com/serapkilinc/secure-chat-app.git
+   git clone https://github.com/serapkilinc/DifHellman.git
 
 2.Navigate to the project directory:
-cd secure-chat-app
+cd DifHellman
 
 3.Open the index.html file in your web browser.
 
@@ -34,7 +34,7 @@ Contributing
 Contributions are welcome! If you have any ideas for improvements or new features, feel free to open an issue or submit a pull request.
 
 License
-This project is licensed under the MIT License - see the LICENSE file for details.
+This project is licensed under the ISC License - see the LICENSE file for details.
 
 Acknowledgements
 This project was developed as part of a learning exercise to understand secure communication techniques using JavaScript ES6 and the Diffie-Hellman key exchange method.
