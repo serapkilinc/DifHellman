@@ -15,7 +15,7 @@ To run the chat application locally on your machine, follow these steps:
 1. Clone this repository to your local machine:
 
    ```bash
-   git clone https://github.com/yourusername/secure-chat-app.git
+   git clone https://github.com/serapkilinc/secure-chat-app.git
 
 2.Navigate to the project directory:
 cd secure-chat-app
