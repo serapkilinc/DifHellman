@@ -1,4 +1,4 @@
-// encryption.js
+import crypto from 'crypto';
 
 export function generateKeys() {
     // Generate public/private key pair
@@ -7,19 +7,16 @@ export function generateKeys() {
     return { publicKey, privateKey };
 }
 
-
-const crypto = require('crypto');
 // Generate Diffie-Hellman key pair
 const dh = crypto.createDiffieHellman(2048); // 2048 is the key size
 const publicKey = dh.generateKeys('hex');
 
-//
-export function encrypt(message, publicKey) {
-    // Encrypt message using public key
-    const otherPublicKey = Buffer.from(publicKey, 'hex');
+export function encrypt(message, otherPublicKey) {
+    // Convert other public key from hex to Buffer
+    const otherPublicKeyBuffer = Buffer.from(otherPublicKey, 'hex');
 
     // Generate shared secret
-    const sharedSecret = dh.computeSecret(otherPublicKey, 'hex');
+    const sharedSecret = dh.computeSecret(otherPublicKeyBuffer);
 
     // Use shared secret to derive encryption key
     const encryptionKey = crypto.createHash('sha256').update(sharedSecret).digest();
@@ -31,13 +28,13 @@ export function encrypt(message, publicKey) {
 
     return encryptedMessage;
 }
-export default crypto;
+
 export function decrypt(encryptedMessage, privateKey) {
     // Convert private key from hex to Buffer
-    const otherPrivateKey = Buffer.from(privateKey, 'hex');
+    const privateKeyBuffer = Buffer.from(privateKey, 'hex');
 
     // Generate shared secret
-    const sharedSecret = dh.computeSecret(otherPrivateKey, 'hex');
+    const sharedSecret = dh.computeSecret(privateKeyBuffer);
 
     // Use shared secret to derive decryption key
     const decryptionKey = crypto.createHash('sha256').update(sharedSecret).digest();

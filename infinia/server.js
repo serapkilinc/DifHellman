@@ -1,36 +1,40 @@
-// server.js
 import express from 'express';
 import http from 'http';
-import { Server } from 'ws';
+import WebSocket from 'ws';
 
 const app = express();
 const server = http.createServer(app);
-const wss = new Server({ server });
+const wss = new WebSocket.Server({ server });
 
 wss.on('connection', (ws) => {
     // Handle WebSocket connection
     ws.on('message', (message) => {
         // Handle incoming message
-        const decryptedMessage = decryptMessage(message);
-        // Store message or broadcast to other clients
-        broadcastMessage(decryptedMessage);
+        try {
+            const decryptedMessage = decryptMessage(message);
+            // Store message or broadcast to other clients
+            broadcastMessage(decryptedMessage);
+        } catch (error) {
+            console.error('Error decrypting message:', error);
+        }
     });
 });
 
-function decryptMessage(encryptedMessage) {
+const decryptMessage = (encryptedMessage) => {
     // Decrypt message using Diffie-Hellman key exchange
-    var decryptedMessage="";
+    let decryptedMessage = "";
+    // Add your decryption logic here
     return decryptedMessage;
-}
+};
 
-function broadcastMessage(message) {
+const broadcastMessage = (message) => {
     // Broadcast message to all connected clients
     wss.clients.forEach((client) => {
         if (client.readyState === WebSocket.OPEN) {
             client.send(message);
         }
     });
-}
+};
 
 server.listen(3000, () => {
     console.log('Server is running on port 3000');

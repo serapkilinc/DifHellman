@@ -1,55 +1,76 @@
-// chat.js
 import { generateKeys, encrypt, decrypt } from './encryption.js';
 import { connectToServer } from './websocket.js';
- function initChat() {
-    // Initialize chat UI and event listeners
-    const chatContainer = document.getElementById("chat-messages");
-    // Connect to WebSocket server
-    const socket = connectToServer();
 
-    // Example usage of encryption
+function initChat() {
+    const chatContainer = document.getElementById("chat-messages");
+    const socket = connectToServer();
     const { publicKey, privateKey } = generateKeys();
 
-    // Send message when "Send" button is clicked
     document.querySelector(".send-button").addEventListener("click", () => {
-
-        //handle message
-        var messageInput = document.getElementById("message-input");
-        var message = messageInput.value;
+        const messageInput = document.getElementById("message-input");
+        const message = messageInput.value;
+        //handle image file
 
         const encryptedMessage = encrypt(message, publicKey);
 
-        // Send encrypted message to server
         socket.send(JSON.stringify({type: 'encrypted', content: encryptedMessage}));
-
-        // Clear message input
         messageInput.value = "";
     });
 
-        // Handle incoming messages
-        socket.onmessage = (event) => {
-            const data = JSON.parse(event.data);
+    socket.onmessage = (event) => {
+        const data = JSON.parse(event.data);
 
-            if (data.type === 'encrypted') {
-                // Decrypt encrypted message
-                const decryptedMessage = decrypt(data.content, privateKey);
+        if (data.type === 'encrypted') {
+            const decryptedMessage = decrypt(data.content, privateKey);
+            displayMessage(decryptedMessage);
+        } else {
+            displayMessage(data.content);
+        }
+    };
+}
+function initImage() {
+    const chatContainer = document.getElementById("chat-messages");
+    const socket = connectToServer();
+    const { publicKey, privateKey } = generateKeys();
 
-                // Display decrypted message in UI
-                displayMessage(decryptedMessage);
-            } else {
-                // Display non-encrypted message directly
-                displayMessage(data.content);
-            }
-        };
-    }
+    // Send client's public key to the server
+    socket.send(JSON.stringify({ type: 'publicKey', content: publicKey }));
+
+    socket.onmessage = (event) => {
+        const data = JSON.parse(event.data);
+
+
+            // When the "Send Image" button is clicked
+            document.querySelector(".image-button").addEventListener("click", () => {
+                const imageInput = document.getElementById("image-input");
+                const imageFile = imageInput.files[0];
+
+                if (imageFile) {
+                    const reader = new FileReader();
+                    reader.onload = () => {
+                        const imageBlob = reader.result;
+
+                        // Encrypt the image binary data using the Diffie-Hellman shared secret
+                        const encryptedImage = encrypt(imageBlob, publicKey);
+
+                        // Send the encrypted image to the server
+                        socket.send(JSON.stringify({ type: 'encryptedImage', content: encryptedImage }));
+                    };
+                    reader.readAsArrayBuffer(imageFile);
+                } else {
+                    console.error('No image file selected.');
+                }
+            });
+
+    };
+}
+
 function displayMessage(message) {
-    // Display message in chat UI
     const chatContainer = document.getElementById("chat-messages");
     const messageElement = document.createElement('div');
-    var messageInput = document.getElementById("message-input");
     messageElement.textContent = message;
     chatContainer.appendChild(messageElement);
-    messageInput.value = "";
-    // Scroll to bottom
     chatContainer.scrollTop = chatContainer.scrollHeight;
 }
+
+export { initChat };
